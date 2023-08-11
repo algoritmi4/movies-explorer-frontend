@@ -15,6 +15,10 @@
   padding: 0 0 26px;
 }
 
+.movies-cardlist__grid-container_saved-movies-page {
+  padding: 0 0 160px;
+}
+
 .movies-cardlist__button {
   color: white;
   font-size: 12px;
@@ -44,6 +48,10 @@
     gap: 45px 30px;
     padding: 0 0 10px;
   }
+
+  .movies-cardlist__grid-container_saved-movies-page {
+    padding: 0 0 93px;
+  }
 }
 
 @media all and (max-width: 520px) {
@@ -55,6 +63,10 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 36px 0;
+  }
+
+  .movies-cardlist__grid-container_saved-movies-page {
+    padding: 0 0 70px;
   }
   
   .movies-cardlist__button {

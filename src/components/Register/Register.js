@@ -5,17 +5,17 @@ import '../Header/Header.css';
 
 function Register(props) {
   return (
-    <div className="register">
+    <section className="register">
       <div className="register__container">
         <img onClick={ () => props.handleNavigate('/') } src={ logo } className="logo" alt="Логотип" />
-        <h2 className="register__title">Добро пожаловать!</h2>
+        <h1 className="register__title">Добро пожаловать!</h1>
         <AuthForm buttonText="Зарегистрироваться" />
         <div className="register__underform-text-container">
           <p className="register__text">Уже зарегистрированы?</p>
           <span onClick={ () => props.handleNavigate('/signin') } className="register__button">Войти</span>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

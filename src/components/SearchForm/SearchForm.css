@@ -33,6 +33,11 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.28571;
+  outline: 1px solid black;
+}
+
+.search-form__input:focus {
+  background-color: black;
 }
 
 .search-form__input::placeholder {

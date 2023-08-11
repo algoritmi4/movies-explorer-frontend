@@ -5,7 +5,7 @@ import AuthForm from '../AuthForm/AuthForm';
 
 function Login(props) {
   return (
-    <div className="register">
+    <section className="register">
       <div className="register__container">
         <img onClick={ () => props.handleNavigate('/') } src={ logo } className="logo" alt="Логотип" />
         <h2 className="register__title">Рады видеть!</h2>
@@ -15,7 +15,7 @@ function Login(props) {
           <span onClick={ () => props.handleNavigate('/signup') } className="register__button">Регистрация</span>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

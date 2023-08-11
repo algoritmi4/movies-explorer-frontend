@@ -15,11 +15,17 @@
   margin: 0;
 }
 
+.profile__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .profile__info-container {
   font-size: 11px;
   font-weight: 500;
   line-height: normal;
-  min-width: 32%;
+  min-width: 410px;
   border-bottom: 1px solid #424242;
   display: flex;
   justify-content: space-between;
@@ -28,7 +34,7 @@
   box-sizing: border-box;
 }
 
-.profile__info-container:nth-last-of-type(2) {
+.profile__info-container:nth-last-of-type(1) {
   border: none;
 }
 
@@ -40,8 +46,58 @@
   margin: 0;
 }
 
-.profile__value {
+.profile__input {
+  color: white;
   margin: 0;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  text-align: end;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.profile__input:focus {
+  outline: none;
+}
+
+.profile__input_active {
+  text-align: start;
+  border-radius: 3px;
+  background-color: #293133;
+  outline: none;
+  padding: 0 0 0 2px;
+}
+
+.profile__input_active:focus {
+  outline: 1px solid black;
+  background-color: black;
+}
+
+.profile__save-button {
+  border: none;
+  background-color: #4285F4;
+  border-radius: 3px;
+  width: 100%;
+  min-height: 45px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: normal;
+  margin: 204px 0 0;
+  display: none;
+  cursor: pointer;
+  transition: opacity .2s linear;
+  padding: 0;
+}
+
+.profile__save-button:hover {
+  opacity: 0.8;
+}
+
+.profile__save-button_active {
+  display: block;
 }
 
 .profile__button-container {
@@ -66,6 +122,10 @@
   opacity: 0.7;
 }
 
+.profile__edit-button_display-none {
+  display: none;
+}
+
 .profile__exit-button {
   font-size: 13px;
   font-weight: 500;
@@ -83,14 +143,21 @@
   opacity: 0.7;
 }
 
+.profile__exit-button_display-none {
+  display: none;
+}
+
 @media all and (max-width: 768px) {
   .profile {
     padding: 236px 0 269px;
   }
 
   .profile__info-container {
-    min-width: 53.39%;
     margin: 79px 0 0;
+  }
+
+  .profile__save-button {
+    margin: 194px 0 0;
   }
 
   .profile__button-container {
@@ -100,17 +167,25 @@
 
 @media all and (max-width: 520px) {
   .profile {
-    padding: 74px 30px 40px;
+    padding: 71px 30px 40px;
   }
   
   .profile__info-container {
-    min-width: none;
-    width: 100%;
+    min-width: 260px;
     margin: 63px 0 0;
+  }
+
+  .profile__input {
+    max-width: 120px;
+  }
+  
+  .profile__save-button {
+    margin: 363px 0 0;
   }
   
   .profile__button-container {
-    margin: 379px 0 0;
+    margin: 363px 0 0;
+    min-width: 260px;
   }
   
   .profile__edit-button {

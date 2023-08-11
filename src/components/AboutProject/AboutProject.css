@@ -59,6 +59,7 @@
   align-items: center;
   justify-content: center;
   color: black;
+  margin: 0;
 }
 
 .about-project__second-scale-part {
@@ -67,6 +68,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
 }
 
 .about-project__caption-box {
@@ -89,7 +91,7 @@
 
 @media all and (max-width: 768px) {
   .about-project {
-    padding: 90px 50px;
+    padding: 91px 50px 90px;
   }
 
   .about-project__info-container {

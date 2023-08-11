@@ -1,7 +1,7 @@
 .about-me {
   color: white;
   width: 100%;
-  padding: 110px 70px 0;
+  padding: 112px 70px 0;
   box-sizing: border-box;
 }
 
@@ -51,10 +51,17 @@
 }
 
 .about-me__caption {
+  color: white;
   font-size: 14px;
   font-weight: 500;
   line-height: normal;
   margin: 99px 0 0;
+  text-decoration: none;
+  transition: opacity .2s linear;
+}
+
+.about-me__caption:hover {
+  opacity: 0.7;
 }
 
 .about-me__photo {
@@ -65,7 +72,11 @@
 
 @media all and (max-width: 768px) {
   .about-me {
-    padding: 90px 50px 0;
+    padding: 91px 50px 0;
+  }
+
+  .about-me__container {
+    padding: 67px 0 0;
   }
 
   .about-me__info-box {
@@ -149,7 +160,7 @@
   }
   
   .about-me__photo {
-    max-height: 352px;
-    max-width: 292px;
+    min-height: 352px;
+    min-width: 292px;
   }
 }

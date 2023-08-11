@@ -2,11 +2,11 @@ import './NotFoundError.css';
 
 function NotFoundError(props) {
   return (
-    <div className="not-found-error">
-      <h2 className="not-found-error__title">404</h2>
+    <section className="not-found-error">
+      <h1 className="not-found-error__title">404</h1>
       <p className="not-found-error__text">Страница не найдена</p>
-      <button onClick={ () => props.handleNavigate('/') } className="not-found-error__exit-button">Назад</button>
-    </div>
+      <button type="button" onClick={ () => props.handleNavigate('/') } className="not-found-error__exit-button">Назад</button>
+    </section>
   )
 }
 

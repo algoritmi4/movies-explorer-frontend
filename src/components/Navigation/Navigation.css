@@ -30,8 +30,10 @@
 }
 
 .navigation__button {
-  border: none;
-  background-color: transparent;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.33;
@@ -95,6 +97,10 @@
 
 .navigation__button_active {
   font-weight: 500;
+}
+
+.navigation__button_display-none {
+  display: none;
 }
 
 @media all and (max-width: 768px) {
@@ -217,5 +223,9 @@
     border-radius: 20px;
     min-width: 100px;
     margin: 444px 0 0;
+  }
+
+  .navigation__button_active {
+    border-bottom: 2px solid white;
   }
 }

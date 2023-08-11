@@ -3,7 +3,7 @@ import photo from '../../images/about-me__photo.jpg';
 
 function AboutMe() {
   return (
-    <div id="about-me" className="about-me">
+    <section id="about-me" className="about-me">
       <h2 className="about-me__title">Студент</h2>
       <figure className="about-me__container">
         <figcaption className="about-me__info-box">
@@ -14,11 +14,11 @@ function AboutMe() {
            Недавно начал кодить. 
            С 2015 года работал в компании «СКБ Контур». 
            После того, как прошёл курс по веб-разработке, начал заниматься фриланс-заказами и ушёл с постоянной работы.</p>
-          <p className="about-me__caption">Github</p>
+          <a href="https://github.com/Agregati4" rel="noreferrer" target="_blank" className="about-me__caption">Github</a>
         </figcaption>
-        <img src={ photo } className="about-me__photo" alt="Фото" />
+        <img src={ photo } className="about-me__photo" alt="Фотография разработчика" />
       </figure>
-    </div>
+    </section>
   )
 }
 

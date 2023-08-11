@@ -47,14 +47,14 @@ function App() {
             </>
           } />
           <Route path='/signin' element={
-            <>
+            <main>
               <Login handleNavigate={ handleNavigate }/>
-            </>
+            </main>
           } />
           <Route path='/signup' element={
-            <>
+            <main>
               <Register handleNavigate={ handleNavigate }/>
-            </>
+            </main>
           } />
           <Route path='/movies' element={
             <>
@@ -63,23 +63,25 @@ function App() {
                 isMoviesPage={ true }
                 handleNavigate={ handleNavigate }
               />
-              <SearchForm />
-              <MoviesCardList children={
-                <>
-                  <MoviesCard photo={ photo1 } filmDuration={ filmDuration } filmTitle="33 слова о дизайне" isCardSaved={ true } />
-                  <MoviesCard photo={ photo2 } filmDuration={ filmDuration } filmTitle="Киноальманах «100 лет дизайна»" isCardSaved={ true } />
-                  <MoviesCard photo={ photo3 } filmDuration={ filmDuration } filmTitle="В погоне за Бенкси" isCardSaved={ true } />
-                  <MoviesCard photo={ photo4 } filmDuration={ filmDuration } filmTitle="Баския: Взрыв реальности" isCardSaved={ false } />
-                  <MoviesCard photo={ photo5 } filmDuration={ filmDuration } filmTitle="Бег это свобода" isCardSaved={ false } />
-                  <MoviesCard photo={ photo6 } filmDuration={ filmDuration } filmTitle="Книготорговцы" isCardSaved={ false } />
-                  <MoviesCard photo={ photo7 } filmDuration={ filmDuration } filmTitle="Когда я думаю о Германии ночью" isCardSaved={ false } />
-                  <MoviesCard photo={ photo8 } filmDuration={ filmDuration } filmTitle="Gimme Danger: История Игги и The Stooges" isCardSaved={ false } />
-                  <MoviesCard photo={ photo9 } filmDuration={ filmDuration } filmTitle="Дженис: Маленькая девочка грустит" isCardSaved={ false } />
-                  <MoviesCard photo={ photo10 } filmDuration={ filmDuration } filmTitle="Соберись перед прыжком" isCardSaved={ false } />
-                  <MoviesCard photo={ photo11 } filmDuration={ filmDuration } filmTitle="Пи Джей Харви: A dog called money" isCardSaved={ false } />
-                  <MoviesCard photo={ photo12 } filmDuration={ filmDuration } filmTitle="По волнам: Искусство звука в кино" isCardSaved={ false } />
-                </>
-              } />
+              <main>
+                <SearchForm />
+                <MoviesCardList children={
+                  <>
+                    <MoviesCard photo={ photo1 } filmDuration={ filmDuration } filmTitle="33 слова о дизайне" isCardSaved={ true } isSavedMoviesPage={ false } alt={ "Постер к фильму 33 слова о дизайне" } />
+                    <MoviesCard photo={ photo2 } filmDuration={ filmDuration } filmTitle="Киноальманах «100 лет дизайна»" isCardSaved={ true } isSavedMoviesPage={ false } alt={ "Постер к фильму Киноальманах «100 лет дизайна»" } />
+                    <MoviesCard photo={ photo3 } filmDuration={ filmDuration } filmTitle="В погоне за Бенкси" isCardSaved={ true } isSavedMoviesPage={ false } alt={ "Постер к фильму В погоне за Бенкси" } />
+                    <MoviesCard photo={ photo4 } filmDuration={ filmDuration } filmTitle="Баския: Взрыв реальности" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Баския: Взрыв реальности" } />
+                    <MoviesCard photo={ photo5 } filmDuration={ filmDuration } filmTitle="Бег это свобода" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Бег это свобода" } />
+                    <MoviesCard photo={ photo6 } filmDuration={ filmDuration } filmTitle="Книготорговцы" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Книготорговцы" } />
+                    <MoviesCard photo={ photo7 } filmDuration={ filmDuration } filmTitle="Когда я думаю о Германии ночью" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Когда я думаю о Германии ночью" } />
+                    <MoviesCard photo={ photo8 } filmDuration={ filmDuration } filmTitle="Gimme Danger: История Игги и The Stooges" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Gimme Danger: История Игги и The Stooges" } />
+                    <MoviesCard photo={ photo9 } filmDuration={ filmDuration } filmTitle="Дженис: Маленькая девочка грустит" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Дженис: Маленькая девочка грустит" } />
+                    <MoviesCard photo={ photo10 } filmDuration={ filmDuration } filmTitle="Соберись перед прыжком" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Соберись перед прыжком" } />
+                    <MoviesCard photo={ photo11 } filmDuration={ filmDuration } filmTitle="Пи Джей Харви: A dog called money" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Пи Джей Харви: A dog called money" } />
+                    <MoviesCard photo={ photo12 } filmDuration={ filmDuration } filmTitle="По волнам: Искусство звука в кино" isCardSaved={ false } isSavedMoviesPage={ false } alt={ `Постер к фильму По волнам: Искусство звука в кино` } />
+                  </>
+                } />
+              </main>
               <Footer />
             </>
           } />
@@ -90,30 +92,34 @@ function App() {
                 isSavedMoviesPage={ true }
                 handleNavigate={ handleNavigate }
               />
-              <SearchForm />
-              <MoviesCardList isSavedMoviesPage={ true } children={
-                <>
-                  <MoviesCard photo={ photo1 } filmDuration={ filmDuration } filmTitle="33 слова о дизайне" isCardSaved={ true } isSavedMoviesPage={ true } />
-                  <MoviesCard photo={ photo2 } filmDuration={ filmDuration } filmTitle="Киноальманах «100 лет дизайна»" isCardSaved={ true } isSavedMoviesPage={ true } />
-                  <MoviesCard photo={ photo3 } filmDuration={ filmDuration } filmTitle="В погоне за Бенкси" isCardSaved={ true } isSavedMoviesPage={ true } />
-                </>
-              } />
+              <main>
+                <SearchForm />
+                <MoviesCardList isSavedMoviesPage={ true } children={
+                  <>
+                    <MoviesCard photo={ photo1 } filmDuration={ filmDuration } filmTitle="33 слова о дизайне" isCardSaved={ true } isSavedMoviesPage={ true } alt={ "Постер к фильму 33 слова о дизайне" } />
+                    <MoviesCard photo={ photo2 } filmDuration={ filmDuration } filmTitle="Киноальманах «100 лет дизайна»" isCardSaved={ true } isSavedMoviesPage={ true } alt={ "Постер к фильму Киноальманах «100 лет дизайна»" } />
+                    <MoviesCard photo={ photo3 } filmDuration={ filmDuration } filmTitle="В погоне за Бенкси" isCardSaved={ true } isSavedMoviesPage={ true } alt={ "Постер к фильму В погоне за Бенкси" } />
+                  </>
+                } />
+              </main>
               <Footer />
             </>
           } />
           <Route path='/profile' element={
             <>
-                <Header
-                  isLoggedIn={ true }
-                  handleNavigate={ handleNavigate }
-                />
+              <Header
+                isLoggedIn={ true }
+                handleNavigate={ handleNavigate }
+              />
+              <main>
                 <Profile handleNavigate={ handleNavigate } />
+              </main>
             </>
           } />
           <Route path='*' element={
-            <>
+            <main>
               <NotFoundError handleNavigate={ handleNavigate } />
-            </>
+            </main>
           } />
         </Routes>
       </div>

@@ -13,7 +13,11 @@
   margin: 20px 0 0;
 }
 
-.auth-form__input-title:first-of-type {
+.auth-form__input-title:first-child {
+  margin: 0;
+}
+
+.auth-form__input-title_none-margin {
   margin: 0;
 }
 
@@ -28,6 +32,11 @@
   font-size: 13px;
   font-weight: 400;
   line-height: normal;
+  outline: 1px solid black;
+}
+
+.auth-form__input:focus {
+  background-color: black;
 }
 
 .auth-form__input-title_error {

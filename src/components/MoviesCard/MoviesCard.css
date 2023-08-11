@@ -11,6 +11,8 @@
   right: 14px;
   background-color: #313131;
   background-repeat: no-repeat;
+  border: none;
+  padding: 0;
   color: #FFF;
   font-size: 10px;
   font-weight: 400;
@@ -27,7 +29,7 @@
 
 .movies-card__save-condition_saved {
   min-width: 21px;
-  background-image: url(../../images/saved-card-icon.png);
+  background-image: url('../../images/saved-card-icon.svg');
   display: flex;
 }
 
@@ -48,9 +50,13 @@
   opacity: 0.8;
 }
 
+.movies-card__save-condition_saved:hover {
+  opacity: 1;
+}
+
 .movies-card__save-condition_saved-movies-page {
   min-width: 21px;
-  background-image: url('../../images/delete-saved-card-icon.png');
+  background-image: url('../../images/delete-saved-card-icon.svg');
 }
 
 .movies-card__description {
@@ -85,9 +91,14 @@
   border-radius: 3px;
   min-width: 52px;
   min-height: 18px;
+  margin: 0;
 }
 
 @media all and (max-width: 768px) {
+  .movies-card {
+    min-height: 233px;
+  }
+
   .movies-card__image {
     max-height: 190px;
   }
@@ -100,6 +111,7 @@
 @media all and (max-width: 520px) {
   .movies-card {
     max-height: 202px;
+    min-height: 190px;
   }
   
   .movies-card__save-condition {
@@ -112,7 +124,7 @@
   }
   
   .movies-card__description {
-    padding: 17+px 0 0;
+    padding: 17px 0 0;
   }
   
   .movies-card__film-title {
