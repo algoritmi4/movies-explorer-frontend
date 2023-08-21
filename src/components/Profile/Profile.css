@@ -32,6 +32,7 @@
   margin: 106px 0 0;
   padding: 17px 0 16px;
   box-sizing: border-box;
+  position: relative;
 }
 
 .profile__info-container:nth-last-of-type(1) {
@@ -40,6 +41,38 @@
 
 .profile__info-container:nth-of-type(n+2) {
   margin: 0;
+}
+
+.profile__input-error {
+  display: none;
+  box-sizing: border-box;
+  color: #FF004C;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: normal;
+  position: absolute;
+  width: 100%;
+  min-height: 20px;
+  background-color: #313131;
+  border-radius: 5px;
+}
+
+.profile__input-error_type_top {
+  align-items: flex-start;
+  padding: 4px 0 10px 4px;
+  bottom: 40px;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 96% 80%, 94% 100%, 92% 80%, 0% 80%);
+}
+
+.profile__input-error_type_bottom {
+  align-items: flex-end;
+  padding: 10px 0 4px 4px;
+  top: 40px;
+  clip-path: polygon(0% 100%, 0% 20%, 92% 20%, 94% 0%, 96% 20%, 100% 20%, 100% 100%);
+}
+
+.profile__input-error_active {
+  display: flex;
 }
 
 .profile__name {
@@ -75,6 +108,21 @@
   background-color: black;
 }
 
+.profile__save-info-error {
+  display: none;
+  width: 100%;
+  color: #FF004C;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: normal;
+  text-align: center;
+  margin: 170px 0 0;
+}
+
+.profile__save-info-error_active {
+  display: block;
+}
+
 .profile__save-button {
   border: none;
   background-color: #4285F4;
@@ -100,10 +148,29 @@
   display: block;
 }
 
+.profile__save-button_disabled {
+  background-color: transparent;
+  border: 1px solid black;
+  cursor: default;
+  box-sizing: border-box;
+}
+
+.profile__save-button_disabled:hover {
+  opacity: 1;
+}
+
+.profile__save-button_error {
+  margin: 20px 0 0;
+}
+
 .profile__button-container {
   display: flex;
   flex-direction: column;
   margin: 204px 0 0;
+}
+
+.profile__button-container_error {
+  margin: 20px 0 0;
 }
 
 .profile__edit-button {
@@ -156,8 +223,16 @@
     margin: 79px 0 0;
   }
 
+  .profile__save-info-error {
+    margin: 160px 0 0;
+  }
+
   .profile__save-button {
     margin: 194px 0 0;
+  }
+
+  .profile__save-button_error {
+    margin: 20px 0 0;
   }
 
   .profile__button-container {
@@ -178,9 +253,17 @@
   .profile__input {
     max-width: 120px;
   }
+
+  .profile__save-info-error {
+    margin: 329px 0 0;
+  }
   
   .profile__save-button {
     margin: 363px 0 0;
+  }
+
+  .profile__save-button_error {
+    margin: 20px 0 0;
   }
   
   .profile__button-container {

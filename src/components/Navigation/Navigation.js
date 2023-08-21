@@ -34,7 +34,7 @@ function Navigation(props) {
           `navigation__button navigation__button_type_signup
           ${ props.isLoggedIn ? "navigation__button_display-none" : "" }`
         }>Регистрация</a>
-        <a href={ props.isLoggedIn ? "profile" : "signin" } className={
+        <a href={ props.isLoggedIn ? "/profile" : "/signin" } className={
           `navigation__button navigation__button_type_signin
           ${ props.isLoggedIn ? "navigation__button_loggedIn" : "" }
           ${ !props.isLoggedIn ? "navigation__button_loggedOut" : "" }`
