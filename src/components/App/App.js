@@ -3,6 +3,16 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import '../Main/Main.css';
 import '../../vendor/displayNone.css';
+import {
+  SHOWN_MOVIES_QUANTITY_HIGH,
+  SHOWN_MOVIES_QUANTITY_MID,
+  SHOWN_MOVIES_QUANTITY_LOW,
+  ADD_MOVIES_QUANTITY_HIGH,
+  ADD_MOVIES_QUANTITY_LOW,
+  DEVICE_WIDTH_HIGH,
+  DEVICE_WIDTH_MID,
+  DEVICE_WIDTH_LOW
+} from '../../utils/Config';
 import CurrentUserContext from '../../Contexts/CurrentUserContext';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import mainApi from '../../utils/MainApi';
@@ -29,6 +39,7 @@ function App() {
   const [ moviesInputValue, setMoviesInputValue ] = React.useState('');
   const [ savedMoviesInputValue, setSavedMoviesInputValue ] = React.useState('');
   const [ shownMovies, setShownMovies ] = React.useState([]);
+  const [ moviesData, setMoviesData ] = React.useState([]);
   const [ isPreloaderActive, setIsPreloaderActive ] = React.useState(false);
   const [ notFoundMoviesText, setNotFoundMoviesText ] = React.useState('');
   const [ checkboxCondition, setCheckboxCondition ] = React.useState(false);
@@ -37,19 +48,17 @@ function App() {
   const [ profileSaveButtonText, setProfileSaveButtonText ] = React.useState('Сохранить');
   const [ logButtonText, setLogButtonText ] = React.useState('Войти');
   const [ regButtonText, setRegButtonText ] = React.useState('Зарегистрироваться');
-  const [ shownMoviesQuantity, setShownMoviesQuantity ] = React.useState(12);
-  const [ addMoviesQuantity, setAddMoviesQuantity ] = React.useState(3);
+  const [ shownMoviesQuantity, setShownMoviesQuantity ] = React.useState(SHOWN_MOVIES_QUANTITY_HIGH);
+  const [ addMoviesQuantity, setAddMoviesQuantity ] = React.useState(ADD_MOVIES_QUANTITY_HIGH);
   const [ pageDisplayNone, setPageDisplayNone ] = React.useState(true);
   const [ notification, setNotification ] = React.useState({ text: '', isGood: false, isActive: false });
+  const [ isSearchFormErrorActive, setIsSearchFormErrorActive ] = React.useState(false);
 
   React.useEffect(() => {
     auth.validation()
     .then((userInfo) => {
       setIsLoggedIn(true);
       setCurrentUser(userInfo.data);
-      setMoviesInputValue((state) => localStorage.moviesInputValue ? localStorage.moviesInputValue : state);
-      setShownMovies((state) => localStorage.shownMovies ? JSON.parse(localStorage.shownMovies) : state);
-      setCheckboxCondition(localStorage.checkboxCondition ? JSON.parse(localStorage.checkboxCondition) : false);
     })
     .catch(() => {
       setIsLoggedIn(false);
@@ -166,28 +175,48 @@ function App() {
   }
 
   function onSubmitMoviesPageSearchForm(data) {
-    moviesApi.getMovies()
+    // eslint-disable-next-line eqeqeq
+    if (moviesData.length == 0) {
+      moviesApi.getMovies()
       .then((movies) => {
+        setMoviesData(movies);
         const filteredMovies = movies.filter((movie) =>
           movie.nameRU.toLowerCase().includes(moviesInputValue.toLowerCase()) || movie.nameEN.toLowerCase().includes(moviesInputValue.toLowerCase())
         );
         const finalMovies = filteredMovies.map((movie) => 
           data.some((savedMovie) => savedMovie.movieId === movie.id) ? { ...movie, isCardSaved: true } : { ...movie, isCardSaved: false }
         );
-
+  
         setShownMovies(finalMovies);
         setNotFoundMoviesText("Ничего не найдено");
-
+        handleResize();
+  
         localStorage.setItem("moviesInputValue", moviesInputValue);
         localStorage.setItem("shownMovies", JSON.stringify(finalMovies));
-        localStorage.setItem("checkboxCondition", JSON.stringify(checkboxCondition));
       })
       .catch(() => {
         setNotFoundMoviesText("Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз");
       })
       .finally(() => {
         setIsPreloaderActive(false);
+        setIsSearchFormErrorActive(false);
       })
+    } else {
+      const filteredMovies = moviesData.filter((movie) =>
+        movie.nameRU.toLowerCase().includes(moviesInputValue.toLowerCase()) || movie.nameEN.toLowerCase().includes(moviesInputValue.toLowerCase())
+      );
+      const finalMovies = filteredMovies.map((movie) => 
+        data.some((savedMovie) => savedMovie.movieId === movie.id) ? { ...movie, isCardSaved: true } : { ...movie, isCardSaved: false }
+      );
+
+      setShownMovies(finalMovies);
+      setIsPreloaderActive(false);
+      setIsSearchFormErrorActive(false);
+      handleResize();
+
+      localStorage.setItem("moviesInputValue", moviesInputValue);
+      localStorage.setItem("shownMovies", JSON.stringify(finalMovies));
+    }
   }
 
   function handleMovieLike(movieData, savedMoviesData) {
@@ -288,13 +317,18 @@ function App() {
     setTimeout(() => {
       let deviceWidth = window.screen.width;
 
-      if (deviceWidth <= 768) {
-        setShownMoviesQuantity(8);
-        setAddMoviesQuantity(2);
+      if (deviceWidth >= DEVICE_WIDTH_HIGH) {
+        setShownMoviesQuantity(SHOWN_MOVIES_QUANTITY_HIGH);
+        setAddMoviesQuantity(ADD_MOVIES_QUANTITY_HIGH);
+      }
+
+      if (deviceWidth <= DEVICE_WIDTH_MID) {
+        setShownMoviesQuantity(SHOWN_MOVIES_QUANTITY_MID);
+        setAddMoviesQuantity(ADD_MOVIES_QUANTITY_LOW);
       }
   
-      if (deviceWidth <= 520) {
-        setShownMoviesQuantity(5);
+      if (deviceWidth <= DEVICE_WIDTH_LOW) {
+        setShownMoviesQuantity(SHOWN_MOVIES_QUANTITY_LOW);
       }
     }, 1000);
   }
@@ -324,6 +358,8 @@ function App() {
                   setSignErrorMessage={ setSignErrorMessage }
                   logButtonText={ logButtonText }
                   setLogButtonText={ setLogButtonText }
+                  navigate={ navigate }
+                  isLoggedIn={ isLoggedIn }
                 />
               </main>
             } />
@@ -336,6 +372,8 @@ function App() {
                   setSignErrorMessage={ setSignErrorMessage }
                   regButtonText={ regButtonText }
                   setRegButtonText={ setRegButtonText }
+                  navigate={ navigate }
+                  isLoggedIn={ isLoggedIn }
                 />
               </main>
             } />
@@ -362,6 +400,9 @@ function App() {
                 setAddMoviesQuantity={ setAddMoviesQuantity }
                 handleResize={ handleResize }
                 notification={ notification }
+                isSearchFormErrorActive={ isSearchFormErrorActive }
+                setIsSearchFormErrorActive={ setIsSearchFormErrorActive }
+                setShownMovies={ setShownMovies }
               />
             } /> } />
             <Route path='/saved-movies' element={ <ProtectedRoute isLoggedIn={ isLoggedIn } element={
@@ -382,6 +423,8 @@ function App() {
                 checkboxCondition={ checkboxCondition }
                 shownMoviesArray={ shownMovies }
                 notification={ notification }
+                isSearchFormErrorActive={ isSearchFormErrorActive }
+                setIsSearchFormErrorActive={ setIsSearchFormErrorActive }
               />
             } /> } />
             <Route path='/profile' element={ <ProtectedRoute isLoggedIn={ isLoggedIn } element={

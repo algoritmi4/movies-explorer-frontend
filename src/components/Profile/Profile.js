@@ -28,7 +28,7 @@ function Profile(props) {
 
   return (
     <section className="profile">
-      <h1 className="profile__title">Привет, Виталий!</h1>
+      <h1 className="profile__title">{`Привет, ${ currentUser.name }!`}</h1>
       <form className="profile__form" onSubmit={ handleSubmit } ref={ formRef } noValidate>
         <div className="profile__info-container">
           <span className={ `profile__input-error profile__input-error_type_top ${ errors["name-input"] === "" ? "" : "profile__input-error_active" }` }>{ errors["name-input"] }</span>

@@ -23,6 +23,7 @@ function AuthForm(props) {
       <input
         type="email"
         className="auth-form__input"
+        pattern="^\S+@\S+\.\S+$"
         name="email-input"
         value={ props.values["email-input"] }
         onChange={ props.handleInputChange }

@@ -5,11 +5,14 @@ import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import Footer from "../Footer/Footer";
 import Notification from '../Notification/Notification';
+import { SHORT_MOVIE_DURATION } from '../../utils/Config';
 
 function SavedMoviesPage(props) {
   React.useEffect(() => {
     props.handleShownSavedMovies();
     props.handleSavedMoviesData();
+
+    props.setCheckboxCondition(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -30,10 +33,12 @@ function SavedMoviesPage(props) {
           onSubmitSearchForm={ props.onSubmitSearchForm }
           setIsPreloaderActive={ props.setIsPreloaderActive }
           checkboxCondition={ props.checkboxCondition }
+          isSearchFormErrorActive={ props.isSearchFormErrorActive }
+          setIsSearchFormErrorActive={ props.setIsSearchFormErrorActive }
         />
         <MoviesCardList
           isSavedMoviesPage={ true }
-          shownMovies={ props.checkboxCondition ? props.shownMovies.filter((movie) => movie["duration"] <= 40) : props.shownMovies }
+          shownMovies={ props.checkboxCondition ? props.shownMovies.filter((movie) => movie["duration"] <= SHORT_MOVIE_DURATION) : props.shownMovies }
           isPreloaderActive={ props.isPreloaderActive }
           notFoundMoviesText={ props.notFoundMoviesText }
           isCardSaved={ true }

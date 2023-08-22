@@ -18,6 +18,29 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  position: relative;
+}
+
+.search-form__error-message {
+  display: none;
+  box-sizing: border-box;
+  color: #FF004C;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: normal;
+  position: absolute;
+  min-height: 10px;
+  background-color: #313131;
+  border-radius: 5px;
+  align-items: flex-start;
+  padding: 14px 7px 8px;
+  top: 52px;
+  left: 5px;
+  clip-path: polygon(0% 100%, 0% 15%, 15% 15%, 19% 0%, 23% 15%, 100% 15%, 100% 100%);
+}
+
+.search-form__error-message_active {
+  display: flex;
 }
 
 .search-form__input {

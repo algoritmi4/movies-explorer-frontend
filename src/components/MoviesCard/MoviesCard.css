@@ -122,6 +122,7 @@
   .movies-card__save-condition {
     top: 10px;
     right: 10px;
+    display: flex;
   }
   
   .movies-card__image {

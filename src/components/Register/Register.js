@@ -11,6 +11,13 @@ function Register(props) {
     formRef, { "name-input": "", "email-input": "", "password-input": "" }, { "name-input": "", "email-input": "", "password-input": "" }
   );
 
+  React.useEffect(() => {
+    if (props.isLoggedIn) {
+      props.navigate('/');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function onSubmit(e) {
     e.preventDefault();
 

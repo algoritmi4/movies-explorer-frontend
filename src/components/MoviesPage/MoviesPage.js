@@ -5,11 +5,16 @@ import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import Footer from "../Footer/Footer";
 import Notification from '../Notification/Notification';
+import { SHORT_MOVIE_DURATION } from '../../utils/Config';
 
 function MoviesPage(props) {
   React.useEffect(() => {
     props.handleSavedMoviesData();
     props.handleResize();
+
+    props.setMoviesInputValue((state) => localStorage.moviesInputValue ? localStorage.moviesInputValue : state);
+    props.setShownMovies((state) => localStorage.shownMovies ? JSON.parse(localStorage.shownMovies) : state);
+    props.setCheckboxCondition(localStorage.checkboxCondition ? JSON.parse(localStorage.checkboxCondition) : false);
 
     window.addEventListener('resize', props.handleResize);
 
@@ -34,10 +39,12 @@ function MoviesPage(props) {
           setCheckboxCondition={ props.setCheckboxCondition }
           savedMoviesData={ props.savedMoviesData }
           checkboxCondition={ props.checkboxCondition }
+          isSearchFormErrorActive={ props.isSearchFormErrorActive }
+          setIsSearchFormErrorActive={ props.setIsSearchFormErrorActive }
         />
         <MoviesCardList
           moviesInputValue={ props.moviesInputValue }
-          shownMovies={ props.checkboxCondition ? props.shownMoviesArray.filter((movie) => movie["duration"] <= 40) : props.shownMovies }
+          shownMovies={ props.checkboxCondition ? props.shownMoviesArray.filter((movie) => movie["duration"] <= SHORT_MOVIE_DURATION) : props.shownMovies }
           isPreloaderActive={ props.isPreloaderActive }
           notFoundMoviesText={ props.notFoundMoviesText }
           checkboxCondition={ props.checkboxCondition }

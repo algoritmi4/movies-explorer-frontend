@@ -4,8 +4,9 @@ function FilterCheckbox(props) {
   function handleCheckbox() {
     props.setCheckboxCondition((state) => {
       state = !state;
+      localStorage.setItem("checkboxCondition", JSON.stringify(state));
       return state;
-    })
+    });
   }
 
   return (
