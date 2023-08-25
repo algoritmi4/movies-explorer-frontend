@@ -1,129 +1,462 @@
 import * as React from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
+import '../Main/Main.css';
+import '../../vendor/displayNone.css';
+import {
+  SHOWN_MOVIES_QUANTITY_HIGH,
+  SHOWN_MOVIES_QUANTITY_MID,
+  SHOWN_MOVIES_QUANTITY_LOW,
+  ADD_MOVIES_QUANTITY_HIGH,
+  ADD_MOVIES_QUANTITY_LOW,
+  DEVICE_WIDTH_HIGH,
+  DEVICE_WIDTH_MID,
+  DEVICE_WIDTH_LOW
+} from '../../utils/Config';
+import CurrentUserContext from '../../Contexts/CurrentUserContext';
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+import mainApi from '../../utils/MainApi';
+import moviesApi from '../../utils/MoviesApi';
+import auth from '../Auth/Auth';
 import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
-import SearchForm from '../SearchForm/SearchForm';
-import MoviesCardList from '../MoviesCardList/MoviesCardList';
+import MoviesPage from '../MoviesPage/MoviesPage';
 import Profile from '../Profile/Profile';
 import Register from '../Register/Register';
 import Login from '../Login/Login';
 import NotFoundError from '../NotFoundError/NotFoundError';
-import MoviesCard from '../MoviesCard/MoviesCard';
-import photo1 from '../../images/photo1.jpg';
-import photo2 from '../../images/photo2.jpg';
-import photo3 from '../../images/photo3.jpg';
-import photo4 from '../../images/photo4.jpg';
-import photo5 from '../../images/photo5.jpg';
-import photo6 from '../../images/photo6.jpg';
-import photo7 from '../../images/photo7.jpg';
-import photo8 from '../../images/photo8.jpg';
-import photo9 from '../../images/photo9.jpg';
-import photo10 from '../../images/photo10.jpg';
-import photo11 from '../../images/photo11.jpg';
-import photo12 from '../../images/photo12.jpg';
-const filmDuration = "1ч 17м";
+import SavedMoviesPage from '../SavedMoviesPage/SavedMoviesPage';
+import Notification from '../Notification/Notification';
 
 function App() {
   const navigate = useNavigate();
+  const [ currentUser, setCurrentUser ] = React.useState({});
+  const [ isLoggedIn, setIsLoggedIn ] = React.useState(true);
+  const [ signErrorMessage, setSignErrorMessage ] = React.useState('');
+  const [ isProfileInputsActive, setIsProfileInputsActive ] = React.useState(false);
+  const [ profileSaveInfoErrorText, setProfileSaveInfoErrorText ] = React.useState('');
+  const [ moviesInputValue, setMoviesInputValue ] = React.useState('');
+  const [ savedMoviesInputValue, setSavedMoviesInputValue ] = React.useState('');
+  const [ shownMovies, setShownMovies ] = React.useState([]);
+  const [ moviesData, setMoviesData ] = React.useState([]);
+  const [ isPreloaderActive, setIsPreloaderActive ] = React.useState(false);
+  const [ notFoundMoviesText, setNotFoundMoviesText ] = React.useState('');
+  const [ checkboxCondition, setCheckboxCondition ] = React.useState(false);
+  const [ shownSavedMovies, setShownSavedMovies ] = React.useState([]);
+  const [ savedMoviesData, setSavedMoviesData ] = React.useState([]);
+  const [ profileSaveButtonText, setProfileSaveButtonText ] = React.useState('Сохранить');
+  const [ logButtonText, setLogButtonText ] = React.useState('Войти');
+  const [ regButtonText, setRegButtonText ] = React.useState('Зарегистрироваться');
+  const [ shownMoviesQuantity, setShownMoviesQuantity ] = React.useState(SHOWN_MOVIES_QUANTITY_HIGH);
+  const [ addMoviesQuantity, setAddMoviesQuantity ] = React.useState(ADD_MOVIES_QUANTITY_HIGH);
+  const [ pageDisplayNone, setPageDisplayNone ] = React.useState(true);
+  const [ notification, setNotification ] = React.useState({ text: '', isGood: false, isActive: false });
+  const [ isSearchFormErrorActive, setIsSearchFormErrorActive ] = React.useState(false);
+
+  React.useEffect(() => {
+    auth.validation()
+    .then((userInfo) => {
+      setIsLoggedIn(true);
+      setCurrentUser(userInfo.data);
+    })
+    .catch(() => {
+      setIsLoggedIn(false);
+    })
+    .finally(() => {
+      setPageDisplayNone(false);
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleNavigate(route) {
     navigate(route);
   }
 
+  function onSignUp(userInfo) {
+    auth.signUp(userInfo)
+    .then(() => {
+      onSignIn(userInfo);
+    })
+    .catch((err) => {
+      if (err.status === 409) {
+        setSignErrorMessage("Пользователь с таким email уже существует.");
+        return;
+      }
+
+      if (err.status === 500) {
+        setSignErrorMessage("На сервере произошла ошибка.")
+      } else {
+        setSignErrorMessage("При регистрации пользователя произошла ошибка.")
+      }
+    })
+    .finally(() => {
+      setRegButtonText('Зарегистрироваться');
+    })
+  };
+
+  function onSignIn(userInfo) {
+    auth.signIn(userInfo)
+    .then((newUserInfo) => {
+      navigate('/movies');
+      setIsLoggedIn(true);
+      setCurrentUser(newUserInfo.data);
+      console.log(currentUser);
+    })
+    .catch((err) => {
+      if (err.status === 401) {
+        setSignErrorMessage("Вы ввели неправильный логин или пароль.");
+        return;
+      }
+
+      if (err.status === 500) {
+        setSignErrorMessage("На сервере произошла ошибка.")
+      } else {
+        setSignErrorMessage("При авторизации произошла ошибка. Токен не передан или передан не в том формате.")
+      }
+    })
+    .finally(() => {
+      setLogButtonText('Вход');
+    })
+  };
+
+  function onSignOut() {
+    auth.signOut()
+    .then(() => {
+      setIsLoggedIn(false);
+      setCurrentUser({ name: "", email: "" });
+      localStorage.clear();
+      setIsProfileInputsActive(false);
+    })
+    .catch((err) => {
+      if (err.status === 500) {
+        setProfileSaveInfoErrorText("На сервере произошла ошибка.")
+      } else {
+        setProfileSaveInfoErrorText("Не удалось выйти из аккаунта. Попробуйте через 2 минуты.");
+      }
+    })
+  }
+
+  function handleNotificationClose() {
+    setNotification({ text: '', isActive: false, isGood: false });
+  }
+
+  function onUpdateUser(data) {
+    mainApi.updateCurrentUser(data)
+    .then((userInfo) => {
+      setCurrentUser({ name: userInfo.data.name, email: userInfo.data.email });
+      handleProfileInputsActive();
+      setProfileSaveInfoErrorText("");
+
+      setNotification({ text: 'Данные успешно обновлены!', isActive: true, isGood: true });
+      setTimeout(() => {
+        handleNotificationClose()
+      }, 3000);
+    })
+    .catch((err) => {
+      if (err.status === 409) {
+        setProfileSaveInfoErrorText("Пользователь с таким email уже существует.");
+        return;
+      }
+
+      if (err.status === 500) {
+        setProfileSaveInfoErrorText("На сервере произошла ошибка.")
+      } else {
+        setProfileSaveInfoErrorText("При обновлении профиля произошла ошибка.");
+      }
+    })
+    .finally(() => {
+      setProfileSaveButtonText('Сохранить');
+    })
+  }
+
+  function handleProfileInputsActive() {
+    setIsProfileInputsActive(!isProfileInputsActive);
+  }
+
+  function onSubmitMoviesPageSearchForm(data) {
+    // eslint-disable-next-line eqeqeq
+    if (moviesData.length == 0) {
+      moviesApi.getMovies()
+      .then((movies) => {
+        setMoviesData(movies);
+        const filteredMovies = movies.filter((movie) =>
+          movie.nameRU.toLowerCase().includes(moviesInputValue.toLowerCase()) || movie.nameEN.toLowerCase().includes(moviesInputValue.toLowerCase())
+        );
+        const finalMovies = filteredMovies.map((movie) => 
+          data.some((savedMovie) => savedMovie.movieId === movie.id) ? { ...movie, isCardSaved: true } : { ...movie, isCardSaved: false }
+        );
+  
+        setShownMovies(finalMovies);
+        setNotFoundMoviesText("Ничего не найдено");
+        handleResize();
+  
+        localStorage.setItem("moviesInputValue", moviesInputValue);
+        localStorage.setItem("shownMovies", JSON.stringify(finalMovies));
+      })
+      .catch(() => {
+        setNotFoundMoviesText("Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз");
+      })
+      .finally(() => {
+        setIsPreloaderActive(false);
+        setIsSearchFormErrorActive(false);
+      })
+    } else {
+      const filteredMovies = moviesData.filter((movie) =>
+        movie.nameRU.toLowerCase().includes(moviesInputValue.toLowerCase()) || movie.nameEN.toLowerCase().includes(moviesInputValue.toLowerCase())
+      );
+      const finalMovies = filteredMovies.map((movie) => 
+        data.some((savedMovie) => savedMovie.movieId === movie.id) ? { ...movie, isCardSaved: true } : { ...movie, isCardSaved: false }
+      );
+
+      setShownMovies(finalMovies);
+      setIsPreloaderActive(false);
+      setIsSearchFormErrorActive(false);
+      handleResize();
+
+      localStorage.setItem("moviesInputValue", moviesInputValue);
+      localStorage.setItem("shownMovies", JSON.stringify(finalMovies));
+    }
+  }
+
+  function handleMovieLike(movieData, savedMoviesData) {
+    if (movieData.isCardSaved) {
+      mainApi.deleteMovie(savedMoviesData.find((movie) => movie.movieId === movieData.id)._id)
+      .then((deletedMovieData) => {
+        const moviesToShow = shownMovies.map((movie) => movie.id === deletedMovieData.movieId ? { ...movie, isCardSaved: false } : movie);
+        setShownMovies(moviesToShow);
+
+        localStorage.setItem("shownMovies", JSON.stringify(moviesToShow));
+
+        setSavedMoviesData((state) => state.splice(state.indexOf(state.find((movie) => movie.id === deletedMovieData.movieId)), 1));
+      })
+      .catch(() => {
+        setNotification({ text: 'Не удалось удалить сохраненный фильм. Попробуйте позже', isActive: true, isGood: false });
+        setTimeout(() => {
+          handleNotificationClose()
+        }, 3000);
+      })
+    } else {
+      mainApi.saveMovie(movieData)
+      .then((newMovieData) => {
+        const currentMovie = shownMovies.find((movie) => movie.id === newMovieData.data.movieId);
+        currentMovie.isCardSaved = true;
+
+        const moviesToShow = shownMovies.map((movie) => movie.id === currentMovie.id ? currentMovie : movie)
+        setShownMovies(moviesToShow);
+
+        localStorage.setItem("shownMovies", JSON.stringify(moviesToShow));
+
+        setSavedMoviesData((state) => [ ...state, newMovieData.data ]);
+      })
+      .catch(() => {
+        setNotification({ text: 'Не удалось сохранить фильм. Попробуйте позже', isActive: true, isGood: false });
+        setTimeout(() => {
+          handleNotificationClose()
+        }, 3000);
+      })
+    }
+  }
+
+  function handleDeleteMovie(_id) {
+    mainApi.deleteMovie(_id)
+    .then((deletedMovieData) => {
+      const moviesData = shownSavedMovies.filter((movie) => !(movie._id === deletedMovieData._id));
+      setShownSavedMovies(moviesData);
+      setSavedMoviesData(moviesData);
+
+      if (localStorage.shownMovies) {
+        const shownMovies = JSON.parse(localStorage.shownMovies);
+
+        const shownMoviesNow = shownMovies.map((movie) => movie.id === deletedMovieData.movieId ? { ...movie, isCardSaved: false } : movie);
+
+        localStorage.setItem("shownMovies", JSON.stringify(shownMoviesNow));
+      }
+    })
+    .catch(() => {
+      setNotification({ text: 'Не удалось удалить сохраненный фильм. Попробуйте позже', isActive: true, isGood: false });
+      setTimeout(() => {
+        handleNotificationClose()
+      }, 3000);
+    })
+  }
+
+  function handleShownSavedMovies() {
+    mainApi.getSavedMoviesData()
+    .then((moviesData) => {
+      setShownSavedMovies(moviesData.data);
+    })
+    .catch((err) => console.log(err))
+  }
+
+  function handleSavedMoviesData() {
+    mainApi.getSavedMoviesData()
+    .then((moviesData) => {
+      setSavedMoviesData(moviesData.data);
+    })
+    .catch((err) => console.log(err));
+  }
+
+  function onSubmitSavedMoviesPageSearchForm() {
+    const shownMovies = savedMoviesData.filter(
+      (movie) => movie.nameRU.toLowerCase().includes(savedMoviesInputValue.toLowerCase()) || movie.nameEN.toLowerCase().includes(savedMoviesInputValue.toLowerCase())
+    );
+    setShownSavedMovies(shownMovies);
+
+    setNotFoundMoviesText("Ничего не найдено");
+  }
+
+  function handleAddMovies() {
+    setShownMoviesQuantity((state) => {
+      state += addMoviesQuantity;
+      return state;
+    });
+  }
+
+  function handleResize() {
+    setTimeout(() => {
+      let deviceWidth = window.screen.width;
+
+      if (deviceWidth >= DEVICE_WIDTH_HIGH) {
+        setShownMoviesQuantity(SHOWN_MOVIES_QUANTITY_HIGH);
+        setAddMoviesQuantity(ADD_MOVIES_QUANTITY_HIGH);
+      }
+
+      if (deviceWidth <= DEVICE_WIDTH_MID) {
+        setShownMoviesQuantity(SHOWN_MOVIES_QUANTITY_MID);
+        setAddMoviesQuantity(ADD_MOVIES_QUANTITY_LOW);
+      }
+  
+      if (deviceWidth <= DEVICE_WIDTH_LOW) {
+        setShownMoviesQuantity(SHOWN_MOVIES_QUANTITY_LOW);
+      }
+    }, 1000);
+  }
+
   return (
-    <div className="page">
-      <div className="page__content">
-        <Routes>
-          <Route path='/' element={
-            <>
-              <Header
-                isLoggedIn={ false }
-                handleNavigate={ handleNavigate }
-              />
-              <Main />
-              <Footer />
-            </>
-          } />
-          <Route path='/signin' element={
-            <main>
-              <Login handleNavigate={ handleNavigate }/>
-            </main>
-          } />
-          <Route path='/signup' element={
-            <main>
-              <Register handleNavigate={ handleNavigate }/>
-            </main>
-          } />
-          <Route path='/movies' element={
-            <>
-              <Header
-                isLoggedIn={ true }
-                isMoviesPage={ true }
-                handleNavigate={ handleNavigate }
-              />
-              <main>
-                <SearchForm />
-                <MoviesCardList children={
-                  <>
-                    <MoviesCard photo={ photo1 } filmDuration={ filmDuration } filmTitle="33 слова о дизайне" isCardSaved={ true } isSavedMoviesPage={ false } alt={ "Постер к фильму 33 слова о дизайне" } />
-                    <MoviesCard photo={ photo2 } filmDuration={ filmDuration } filmTitle="Киноальманах «100 лет дизайна»" isCardSaved={ true } isSavedMoviesPage={ false } alt={ "Постер к фильму Киноальманах «100 лет дизайна»" } />
-                    <MoviesCard photo={ photo3 } filmDuration={ filmDuration } filmTitle="В погоне за Бенкси" isCardSaved={ true } isSavedMoviesPage={ false } alt={ "Постер к фильму В погоне за Бенкси" } />
-                    <MoviesCard photo={ photo4 } filmDuration={ filmDuration } filmTitle="Баския: Взрыв реальности" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Баския: Взрыв реальности" } />
-                    <MoviesCard photo={ photo5 } filmDuration={ filmDuration } filmTitle="Бег это свобода" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Бег это свобода" } />
-                    <MoviesCard photo={ photo6 } filmDuration={ filmDuration } filmTitle="Книготорговцы" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Книготорговцы" } />
-                    <MoviesCard photo={ photo7 } filmDuration={ filmDuration } filmTitle="Когда я думаю о Германии ночью" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Когда я думаю о Германии ночью" } />
-                    <MoviesCard photo={ photo8 } filmDuration={ filmDuration } filmTitle="Gimme Danger: История Игги и The Stooges" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Gimme Danger: История Игги и The Stooges" } />
-                    <MoviesCard photo={ photo9 } filmDuration={ filmDuration } filmTitle="Дженис: Маленькая девочка грустит" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Дженис: Маленькая девочка грустит" } />
-                    <MoviesCard photo={ photo10 } filmDuration={ filmDuration } filmTitle="Соберись перед прыжком" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Соберись перед прыжком" } />
-                    <MoviesCard photo={ photo11 } filmDuration={ filmDuration } filmTitle="Пи Джей Харви: A dog called money" isCardSaved={ false } isSavedMoviesPage={ false } alt={ "Постер к фильму Пи Джей Харви: A dog called money" } />
-                    <MoviesCard photo={ photo12 } filmDuration={ filmDuration } filmTitle="По волнам: Искусство звука в кино" isCardSaved={ false } isSavedMoviesPage={ false } alt={ `Постер к фильму По волнам: Искусство звука в кино` } />
-                  </>
-                } />
+    <CurrentUserContext.Provider value={ currentUser }>
+      <div className={ `page ${ pageDisplayNone ? "display-none" : ""}` }>
+        <div className="page__content">
+          <Routes>
+            <Route path='/' element={
+              <>
+                <Header
+                  isLoggedIn={ isLoggedIn }
+                  handleNavigate={ handleNavigate }
+                />
+                <Main />
+                <Footer />
+              </>
+            } />
+            <Route path='/signin' element={
+              <main className="content">
+                <Login
+                  handleNavigate={ handleNavigate }
+                  login={ true }
+                  onSignIn={ onSignIn }
+                  signErrorMessage={ signErrorMessage }
+                  setSignErrorMessage={ setSignErrorMessage }
+                  logButtonText={ logButtonText }
+                  setLogButtonText={ setLogButtonText }
+                  navigate={ navigate }
+                  isLoggedIn={ isLoggedIn }
+                />
               </main>
-              <Footer />
-            </>
-          } />
-          <Route path='/saved-movies' element={
-            <>
-              <Header
-                isLoggedIn={ true }
-                isSavedMoviesPage={ true }
-                handleNavigate={ handleNavigate }
-              />
-              <main>
-                <SearchForm />
-                <MoviesCardList isSavedMoviesPage={ true } children={
-                  <>
-                    <MoviesCard photo={ photo1 } filmDuration={ filmDuration } filmTitle="33 слова о дизайне" isCardSaved={ true } isSavedMoviesPage={ true } alt={ "Постер к фильму 33 слова о дизайне" } />
-                    <MoviesCard photo={ photo2 } filmDuration={ filmDuration } filmTitle="Киноальманах «100 лет дизайна»" isCardSaved={ true } isSavedMoviesPage={ true } alt={ "Постер к фильму Киноальманах «100 лет дизайна»" } />
-                    <MoviesCard photo={ photo3 } filmDuration={ filmDuration } filmTitle="В погоне за Бенкси" isCardSaved={ true } isSavedMoviesPage={ true } alt={ "Постер к фильму В погоне за Бенкси" } />
-                  </>
-                } />
+            } />
+            <Route path='/signup' element={
+              <main className="content">
+                <Register
+                  handleNavigate={ handleNavigate }
+                  onSignUp={ onSignUp }
+                  signErrorMessage={ signErrorMessage }
+                  setSignErrorMessage={ setSignErrorMessage }
+                  regButtonText={ regButtonText }
+                  setRegButtonText={ setRegButtonText }
+                  navigate={ navigate }
+                  isLoggedIn={ isLoggedIn }
+                />
               </main>
-              <Footer />
-            </>
-          } />
-          <Route path='/profile' element={
-            <>
-              <Header
-                isLoggedIn={ true }
+            } />
+            <Route path='/movies' element={ <ProtectedRoute isLoggedIn={ isLoggedIn } element={
+              <MoviesPage
+                isLoggedIn={ isLoggedIn }
                 handleNavigate={ handleNavigate }
+                moviesInputValue={ moviesInputValue }
+                setMoviesInputValue={ setMoviesInputValue }
+                onSubmitSearchForm={ onSubmitMoviesPageSearchForm }
+                setIsPreloaderActive={ setIsPreloaderActive }
+                setCheckboxCondition={ setCheckboxCondition }
+                shownMovies={ shownMovies.slice(0, shownMoviesQuantity) }
+                shownMoviesArray = { shownMovies }
+                isPreloaderActive={ isPreloaderActive }
+                notFoundMoviesText={ notFoundMoviesText }
+                checkboxCondition={ checkboxCondition }
+                handleMovieLike={ handleMovieLike }
+                handleSavedMoviesData={ handleSavedMoviesData }
+                savedMoviesData={ savedMoviesData }
+                setShownMoviesQuantity={ setShownMoviesQuantity }
+                handleAddMovies={ handleAddMovies }
+                shownMoviesQuantity={ shownMoviesQuantity }
+                setAddMoviesQuantity={ setAddMoviesQuantity }
+                handleResize={ handleResize }
+                notification={ notification }
+                isSearchFormErrorActive={ isSearchFormErrorActive }
+                setIsSearchFormErrorActive={ setIsSearchFormErrorActive }
+                setShownMovies={ setShownMovies }
               />
-              <main>
-                <Profile handleNavigate={ handleNavigate } />
+            } /> } />
+            <Route path='/saved-movies' element={ <ProtectedRoute isLoggedIn={ isLoggedIn } element={
+              <SavedMoviesPage
+                isLoggedIn={ isLoggedIn }
+                handleNavigate={ handleNavigate }
+                shownMovies={ shownSavedMovies }
+                isPreloaderActive={ isPreloaderActive }
+                setIsPreloaderActive={ setIsPreloaderActive }
+                notFoundMoviesText={ notFoundMoviesText }
+                handleShownSavedMovies={ handleShownSavedMovies }
+                handleDeleteMovie={ handleDeleteMovie }
+                onSubmitSearchForm={ onSubmitSavedMoviesPageSearchForm }
+                moviesInputValue={ savedMoviesInputValue }
+                setMoviesInputValue={ setSavedMoviesInputValue }
+                handleSavedMoviesData={ handleSavedMoviesData }
+                setCheckboxCondition={ setCheckboxCondition }
+                checkboxCondition={ checkboxCondition }
+                shownMoviesArray={ shownMovies }
+                notification={ notification }
+                isSearchFormErrorActive={ isSearchFormErrorActive }
+                setIsSearchFormErrorActive={ setIsSearchFormErrorActive }
+              />
+            } /> } />
+            <Route path='/profile' element={ <ProtectedRoute isLoggedIn={ isLoggedIn } element={
+              <>
+                <Header
+                  isLoggedIn={ isLoggedIn }
+                  handleNavigate={ handleNavigate }
+                />
+                <main className="content">
+                  <Notification notification={ notification } />
+                  <Profile
+                    handleNavigate={ handleNavigate }
+                    onSignOut={ onSignOut }
+                    onUpdateUser={ onUpdateUser }
+                    isInputsActive={ isProfileInputsActive }
+                    handleInputsActive={ handleProfileInputsActive }
+                    profileSaveInfoErrorText={ profileSaveInfoErrorText }
+                    profileSaveButtonText={ profileSaveButtonText }
+                    setProfileSaveButtonText={ setProfileSaveButtonText }
+                  />
+                </main>
+              </>
+            } /> } />
+            <Route path='*' element={
+              <main className="content">
+                <NotFoundError handleNavigate={ handleNavigate } />
               </main>
-            </>
-          } />
-          <Route path='*' element={
-            <main>
-              <NotFoundError handleNavigate={ handleNavigate } />
-            </main>
-          } />
-        </Routes>
+            } />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </CurrentUserContext.Provider>
   );
 }
 
